@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  uploads      Upload[]
+  designs      TattooDesign[]
+  generations  Generation[]
+  savedDesigns SavedDesign[]
+}
+
+model Upload {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  url       String
+  publicId  String?
+  bodyPart  String? // "arm", "back", "leg", etc.
+  createdAt DateTime @default(now())
+
+  previews TattooPreview[]
+
+  @@index([userId])
+}
+
+model TattooDesign {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  name        String
+  description String?
+  imageUrl    String
+  category    String // "tribal", "minimal", "japanese", etc.
+  tags        String[]
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  previews TattooPreview[]
+  savedBy  SavedDesign[]
+
+  @@index([userId])
+  @@index([category])
+}
+
+model Generation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prompt    String
+  imageUrl  String
+  model     String // "gemini", "openai-dalle3", "openai-gpt-image"
+  cost      Float?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model TattooPreview {
+  id        String       @id @default(cuid())
+  uploadId  String
+  upload    Upload       @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  designId  String
+  design    TattooDesign @relation(fields: [designId], references: [id], onDelete: Cascade)
+  resultUrl String // Composited preview image
+  position  Json? // { x, y, scale, rotation }
+  createdAt DateTime     @default(now())
+
+  @@index([uploadId])
+  @@index([designId])
+}
+
+model SavedDesign {
+  id        String       @id @default(cuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  designId  String
+  design    TattooDesign @relation(fields: [designId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, designId])
+  @@index([userId])
+}

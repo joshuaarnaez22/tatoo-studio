@@ -48,7 +48,8 @@ async function persistImage(temporaryUrl: string): Promise<string> {
     const permanentUrl =
       uploadData.ufsUrl ||
       uploadData.url ||
-      uploadData.appUrl;
+      uploadData.appUrl ||
+      temporaryUrl;
 
     console.log("Image persisted to:", permanentUrl);
     return permanentUrl;

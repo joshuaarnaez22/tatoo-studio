@@ -31,7 +31,7 @@ export async function GET() {
 
     // Flatten to get all previews
     const previews = uploads.flatMap((upload: (typeof uploads)[number]) =>
-      upload.previews.map((preview) => ({
+      upload.previews.map((preview: (typeof upload.previews)[number]) => ({
         id: preview.id,
         resultUrl: preview.resultUrl,
         position: preview.position,
@@ -71,6 +71,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!designId && !(designImageUrl && designName)) {
+      return NextResponse.json(
+        { error: "Missing required field: designId or designImageUrl+designName" },
+        { status: 400 }
+      );
+    }
+
     // Convert base64 data URL to a file and upload it
     const base64Data = imageDataUrl.replace(/^data:image\/\w+;base64,/, "");
     const buffer = Buffer.from(base64Data, "base64");
@@ -94,6 +101,13 @@ export async function POST(request: NextRequest) {
       uploadData.ufsUrl ||
       uploadData.url ||
       uploadData.appUrl;
+
+    if (!resultUrl) {
+      return NextResponse.json(
+        { error: "Failed to get URL from uploaded preview image" },
+        { status: 500 }
+      );
+    }
 
     console.log("Preview image uploaded:", resultUrl);
 

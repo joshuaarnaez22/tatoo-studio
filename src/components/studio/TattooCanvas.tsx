@@ -22,7 +22,7 @@ interface TattooCanvasProps {
   tattooImage?: string;
   position: TattooPosition;
   onPositionChange: (position: TattooPosition) => void;
-  canvasRef?: React.RefObject<HTMLDivElement | null>;
+  canvasRef?: React.MutableRefObject<HTMLDivElement | null>;
 }
 
 export function TattooCanvas({
@@ -54,8 +54,7 @@ export function TattooCanvas({
   // Set ref for parent access
   useEffect(() => {
     if (canvasRef && containerRef.current) {
-      (canvasRef as React.MutableRefObject<HTMLDivElement | null>).current =
-        containerRef.current;
+      canvasRef.current = containerRef.current;
     }
   }, [canvasRef]);
 

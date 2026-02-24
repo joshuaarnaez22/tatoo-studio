@@ -20,7 +20,8 @@ export const ourFileRouter = {
       console.log("File object:", JSON.stringify(file, null, 2));
 
       // Get URL - try multiple formats
-      const url = file.ufsUrl || (file as any).url || (file as any).appUrl;
+      const fileFallback = file as typeof file & { url?: string; appUrl?: string };
+      const url = file.ufsUrl || fileFallback.url || fileFallback.appUrl;
       console.log("Extracted URL:", url);
 
       if (!url) {

@@ -30,7 +30,7 @@ export async function GET() {
     });
 
     // Flatten to get all previews
-    const previews = uploads.flatMap((upload) =>
+    const previews = uploads.flatMap((upload: (typeof uploads)[number]) =>
       upload.previews.map((preview) => ({
         id: preview.id,
         resultUrl: preview.resultUrl,
@@ -89,10 +89,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const uploadData = uploadResult[0].data as { ufsUrl?: string; url?: string; appUrl?: string };
     const resultUrl =
-      uploadResult[0].data.ufsUrl ||
-      uploadResult[0].data.url ||
-      (uploadResult[0].data as any).appUrl;
+      uploadData.ufsUrl ||
+      uploadData.url ||
+      uploadData.appUrl;
 
     console.log("Preview image uploaded:", resultUrl);
 

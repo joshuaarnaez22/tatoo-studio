@@ -1,9 +1,30 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Float, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
+
+// Computed once at module load — not during render
+const PARTICLE_DATA: { position: [number, number, number]; size: number }[] =
+  Array.from({ length: 30 }, () => ({
+    position: [
+      (Math.random() - 0.5) * 10,
+      (Math.random() - 0.5) * 6,
+      (Math.random() - 0.5) * 4 - 2,
+    ] as [number, number, number],
+    size: 0.02 + Math.random() * 0.03,
+  }));
+
+const DESIGNS = [
+  { position: [-2.5, 1, -1] as [number, number, number], scale: 1.2, color: "#a855f7", floatIntensity: 0.73, rotationSpeed: 0.41 },
+  { position: [2.5, 0.5, -0.5] as [number, number, number], scale: 1, color: "#06b6d4", floatIntensity: 0.87, rotationSpeed: 0.58 },
+  { position: [-1.5, -1, -1.5] as [number, number, number], scale: 0.9, color: "#ec4899", floatIntensity: 0.62, rotationSpeed: 0.47 },
+  { position: [1.8, -0.8, -1] as [number, number, number], scale: 0.8, color: "#8b5cf6", floatIntensity: 0.91, rotationSpeed: 0.35 },
+  { position: [0, 1.5, -2] as [number, number, number], scale: 1.1, color: "#14b8a6", floatIntensity: 0.54, rotationSpeed: 0.63 },
+  { position: [-3, -0.5, -2] as [number, number, number], scale: 0.7, color: "#f43f5e", floatIntensity: 0.78, rotationSpeed: 0.52 },
+  { position: [3, 1.2, -1.5] as [number, number, number], scale: 0.85, color: "#6366f1", floatIntensity: 0.66, rotationSpeed: 0.44 },
+];
 
 interface FloatingDesignProps {
   position: [number, number, number];
@@ -90,79 +111,27 @@ function GlowOrb({
 }
 
 export function FloatingDesigns() {
-  // Generate random particle positions
-  const particles = useMemo(() => {
-    const positions: [number, number, number][] = [];
-    for (let i = 0; i < 30; i++) {
-      positions.push([
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 6,
-        (Math.random() - 0.5) * 4 - 2,
-      ]);
-    }
-    return positions;
-  }, []);
-
-  // Floating card designs with colors
-  const designs = [
-    {
-      position: [-2.5, 1, -1] as [number, number, number],
-      scale: 1.2,
-      color: "#a855f7",
-    },
-    {
-      position: [2.5, 0.5, -0.5] as [number, number, number],
-      scale: 1,
-      color: "#06b6d4",
-    },
-    {
-      position: [-1.5, -1, -1.5] as [number, number, number],
-      scale: 0.9,
-      color: "#ec4899",
-    },
-    {
-      position: [1.8, -0.8, -1] as [number, number, number],
-      scale: 0.8,
-      color: "#8b5cf6",
-    },
-    {
-      position: [0, 1.5, -2] as [number, number, number],
-      scale: 1.1,
-      color: "#14b8a6",
-    },
-    {
-      position: [-3, -0.5, -2] as [number, number, number],
-      scale: 0.7,
-      color: "#f43f5e",
-    },
-    {
-      position: [3, 1.2, -1.5] as [number, number, number],
-      scale: 0.85,
-      color: "#6366f1",
-    },
-  ];
-
   return (
     <>
       {/* Floating tattoo design cards */}
-      {designs.map((design, i) => (
+      {DESIGNS.map((design, i) => (
         <FloatingDesign
           key={i}
           position={design.position}
           scale={design.scale}
           color={design.color}
-          floatIntensity={0.5 + Math.random() * 0.5}
-          rotationSpeed={0.3 + Math.random() * 0.4}
+          floatIntensity={design.floatIntensity}
+          rotationSpeed={design.rotationSpeed}
         />
       ))}
 
       {/* Glowing particles */}
-      {particles.map((pos, i) => (
+      {PARTICLE_DATA.map((particle, i) => (
         <GlowOrb
           key={i}
-          position={pos}
+          position={particle.position}
           color={i % 2 === 0 ? "#a855f7" : "#06b6d4"}
-          size={0.02 + Math.random() * 0.03}
+          size={particle.size}
         />
       ))}
     </>

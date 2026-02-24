@@ -44,10 +44,11 @@ async function persistImage(temporaryUrl: string): Promise<string> {
       throw new Error("Failed to upload to permanent storage");
     }
 
+    const uploadData = uploadResult[0].data as { ufsUrl?: string; url?: string; appUrl?: string };
     const permanentUrl =
-      uploadResult[0].data.ufsUrl ||
-      uploadResult[0].data.url ||
-      (uploadResult[0].data as any).appUrl;
+      uploadData.ufsUrl ||
+      uploadData.url ||
+      uploadData.appUrl;
 
     console.log("Image persisted to:", permanentUrl);
     return permanentUrl;
